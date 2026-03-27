@@ -1,0 +1,83 @@
+DOMAINS
+    number = integer
+    list = number*
+
+PREDICATES
+    nondeterm result()
+    nondeterm get_count(number)
+    nondeterm get_numbers(number, list)
+    nondeterm get_next_number(number, number, list, list)
+    nondeterm is_subset(list, list)
+    nondeterm member(number, list)
+    nondeterm check_subset_relation(list, list)
+
+CLAUSES
+    % Основной предикат программы
+    result() :-
+        write("(Список №1) "),
+        get_count(Count1),
+        get_numbers(Count1, List1),
+
+        write("(Список №2) "),
+        get_count(Count2),
+        get_numbers(Count2, List2),
+
+        check_subset_relation(List1, List2).
+
+    % Запрос количества чисел от пользователя
+    get_count(Count) :-
+        write("Введите количество элементов списка: "),
+        readint(Count),
+        Count > 0, !.
+    get_count(Count) :-
+        write("Количество элементов > 0!\n"),
+        get_count(Count).
+
+    % Формирование списка чисел
+    get_numbers(Count, NumberList) :-
+        get_next_number(Count, 1, [], NumberList).
+
+    % Рекурсивный ввод чисел с накоплением в список
+    get_next_number(TotalCount, CurrentIndex, Acc, Result) :-
+        CurrentIndex <= TotalCount, !,
+        write("Введите число №"), write(CurrentIndex), write(": "),
+        readint(Number),
+        NewAcc = [Number | Acc],
+        NextIndex = CurrentIndex + 1,
+        get_next_number(TotalCount, NextIndex, NewAcc, Result).
+        
+    % Остановка цикла
+    get_next_number(_, _, Acc, Acc).
+
+    % Проверка отношения списков и вывод результата
+    check_subset_relation(List1, List2) :-
+        is_subset(List1, List2), !,
+        write("Список №1 является подмножеством списка №2.\n").
+    check_subset_relation(List1, List2) :-
+        is_subset(List2, List1), !,
+        write("Список №2 является подмножеством списка №1.\n").
+    check_subset_relation(_, _) :-
+        write("Ни один список не является подмножеством другого.\n").
+
+    % Проверка того, является ли первый список подмножеством второго
+    is_subset([], _) :- !.
+    is_subset([Head | Tail], Set) :-
+        member(Head, Set),
+        is_subset(Tail, Set).
+
+    % Проверка принадлежности элемента списку
+    member(X, [X | _]) :- !.
+    member(X, [_ | Tail]) :-
+        member(X, Tail).
+
+GOAL
+    result().
+
+
+
+
+
+
+
+
+
